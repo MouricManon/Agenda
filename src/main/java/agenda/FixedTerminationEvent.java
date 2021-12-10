@@ -31,15 +31,16 @@ public class FixedTerminationEvent extends RepetitiveEvent {
     public FixedTerminationEvent(String title, LocalDateTime start, Duration duration, ChronoUnit frequency, LocalDate terminationInclusive) {
         super(title, start, duration, frequency);
         this.terminationInclusive = terminationInclusive;
-        long between = ChronoUnit.DAYS.between(start, terminationInclusive);
+        LocalDate nStart = start.toLocalDate();
+        long between = ChronoUnit.DAYS.between(nStart, terminationInclusive);
         if (frequency.equals(ChronoUnit.DAYS)) {
-            numberOfOccurrences = between;
+            numberOfOccurrences = ChronoUnit.DAYS.between(nStart, terminationInclusive) + 1;
         }
         if (frequency.equals(ChronoUnit.WEEKS)) {
-            numberOfOccurrences = between / 7;
+            numberOfOccurrences = ChronoUnit.WEEKS.between(nStart, terminationInclusive) + 1;
         }
         if (frequency.equals(ChronoUnit.MONTHS)) {
-            numberOfOccurrences = between / 30;
+            numberOfOccurrences = ChronoUnit.MONTHS.between(nStart, terminationInclusive) + 1;
         }
 
     }
@@ -63,17 +64,16 @@ public class FixedTerminationEvent extends RepetitiveEvent {
         super(title, start, duration, frequency);
         this.numberOfOccurrences = numberOfOccurrences;
         long between = 0;
+        LocalDate nStart = start.toLocalDate();
         if (frequency.equals(ChronoUnit.DAYS)) {
-            between = numberOfOccurrences;
+            terminationInclusive = nStart.plusDays(numberOfOccurrences-1);
         }
         if (frequency.equals(ChronoUnit.WEEKS)) {
-            between = numberOfOccurrences * 7;
+            terminationInclusive = nStart.plusWeeks(numberOfOccurrences-1);
         }
         if (frequency.equals(ChronoUnit.MONTHS)) {
-            between = numberOfOccurrences * 30;
+            terminationInclusive = nStart.plusMonths(numberOfOccurrences-1);
         }
-        LocalDate nStart = start.toLocalDate();
-        terminationInclusive = nStart.plusDays(between);
     }
 
     /**
