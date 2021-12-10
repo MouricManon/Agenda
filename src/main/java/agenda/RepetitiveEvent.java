@@ -8,7 +8,10 @@ import java.time.temporal.ChronoUnit;
  * Description : A repetitive Event
  */
 public class RepetitiveEvent extends Event {
-    protected ChronoUnit frequency ;
+
+    protected ChronoUnit frequency;
+    protected ArrayList<LocalDate> lesexceptions = new ArrayList<LocalDate>();
+
     /**
      * Constructs a repetitive event
      *
@@ -24,7 +27,7 @@ public class RepetitiveEvent extends Event {
      */
     public RepetitiveEvent(String title, LocalDateTime start, Duration duration, ChronoUnit frequency) {
         super(title, start, duration);
-     this.frequency = frequency;
+        this.frequency = frequency;
     }
 
     /**
@@ -33,9 +36,37 @@ public class RepetitiveEvent extends Event {
      * @param date the event will not occur at this date
      */
     public void addException(LocalDate date) {
-        
-        // TODO : implémenter cette méthode
-        throw new UnsupportedOperationException("Pas encore implémenté");
+        lesexceptions.add(date);
+    }
+
+    @Override
+    public boolean isInDay(LocalDate date) {
+        boolean isInDay = false;
+        if (super.isInDay(date) == true) {
+            return true;
+        }
+        for (LocalDate d : lesexceptions) {
+            if (d.equals(date)) {
+                return false;
+            }
+        }
+        LocalDate start = myStart.toLocalDate();
+        while (date.isAfter(start)||date.equals(start)) {
+            if (super.isInDay(start) == true) {
+                return true;
+            }
+            if (frequency == ChronoUnit.DAYS) {
+                start = start.plusDays(1);
+            }
+            if (frequency == ChronoUnit.WEEKS) {
+                start = start.plusWeeks(1);
+            }
+            if (frequency == ChronoUnit.MONTHS) {
+                start = start.plusMonths(1);
+            }
+
+        }
+        return isInDay;
     }
 
     /**
@@ -43,7 +74,7 @@ public class RepetitiveEvent extends Event {
      * @return the type of repetition
      */
     public ChronoUnit getFrequency() {
-        return frequency; 
+        return frequency;
     }
 
 }
